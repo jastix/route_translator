@@ -50,10 +50,11 @@ module RouteTranslator
 
     def translations_for(app, conditions, requirements, defaults, route_name, anchor, route_set)
       RouteTranslator::Translator::RouteHelpers.add route_name, route_set.named_routes
+      scope = [:routes, :controllers].concat defaults[:controller].split('/').map(&:to_sym)
 
       available_locales.each do |locale|
         begin
-          translated_path = RouteTranslator::Translator::Path.translate(conditions[:path_info], locale)
+          translated_path = RouteTranslator::Translator::Path.translate(conditions[:path_info], locale, scope)
         rescue I18n::MissingTranslationData => e
           raise e unless RouteTranslator.config.disable_fallback
           next
